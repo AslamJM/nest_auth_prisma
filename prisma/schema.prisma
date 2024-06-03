@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,8 +7,405 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// users schema
 model User {
   id Int @id @default(autoincrement())
-  username String
+  full_name String
+  username String @unique
   password String
+  email String @unique
+  phone String @unique
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  roles UserRoles[]
+
+   // many to one
+  created_products Product[] @relation("created_by")
+  updated_products Product[] @relation("updated_by")
+
+  purchase_histories PurchaseOrderHistory[]
+  transfer_request_histories TransferRequestHistory[] @relation(name: "transfer_request_history")
+  sale_histories SalesHistory[] @relation(name:"sales_history")
+  
+
+  @@index([username])
+  @@map("users")
+}
+
+model Role {
+  id Int @id @default(autoincrement()) 
+  name String @unique
+  description String
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model UserRoles {
+  id Int @id @default(autoincrement()) 
+  user_id Int
+  role_id Int
+  user User @relation(fields: [user_id],references: [id])
+
+ @@map("users_roles")
+}
+
+// Products and inventory 
+model Category {
+  id Int @id @default(autoincrement())
+  category_name String @unique
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  products Product[]
+
+  @@index([category_name])
+  @@map("categories")
+}
+
+model Brand {
+  id Int @id @default(autoincrement())
+  brand_name String @unique
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  products Product[]
+
+  @@index([brand_name])
+  @@map("brands")
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  product_name String @unique
+  product_number String @unique
+  description String
+  image String
+
+  category_id Int 
+  brand_id Int
+  created_by_id Int
+  updated_by_id Int 
+
+  category Category @relation(fields: [category_id],references: [id])
+  brand Brand @relation(fields: [brand_id],references: [id])
+
+  created_by User @relation(fields: [created_by_id],references: [id],name: "created_by")
+  updated_by User @relation(fields: [updated_by_id],references: [id],name: "updated_by")
+
+  // many to one
+  purchase_order_details PurchaseOrderDetails[]
+  grn_details GRNDetails[]
+  transfer_request_details TransferRequestDetails[]
+  sale_details SaleDetails[]
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("products")
+}
+
+// Customers 
+model Customer {
+  id Int @id @default(autoincrement())
+  full_name String
+  email String @unique
+  address String
+  phone String
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("customers")
+}
+
+// stores 
+model Store {
+  id Int @id @default(autoincrement())
+  name String
+  location String
+  contact_info String
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  grn_details GRNDetails[]
+
+  @@map("stores")
+}
+
+//Purchase Orders and Goods Received Notes(GRN)
+
+enum PurchaseOrderStatus {
+  PENDING
+  RECIEVED
+  CANCELLED
+}
+
+model Supplier {
+  id Int @id @default(autoincrement())
+  name String
+  contact_name String
+  phone String @unique
+  email String @unique
+  address String
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("suppliers")
+}
+
+model PurchaseOrder {
+  id BigInt @id @default(autoincrement())
+  order_date DateTime
+  order_status PurchaseOrderStatus
+  purchase_order_details PurchaseOrderDetails[]
+
+  grn GRN?
+  order_history PurchaseOrderHistory[]
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderDetails {
+  id BigInt @id @default(autoincrement())
+  purchase_order_id BigInt
+  product_id Int
+  quantity Int
+
+  product Product @relation(fields: [product_id],references: [id]) 
+  purchase_order PurchaseOrder @relation(fields: [purchase_order_id],references: [id])
+
+  @@map("purchase_order_details")
+}
+
+model GRN {
+  id BigInt @id @default(autoincrement())
+  recieved_date DateTime
+  purchase_order_id BigInt @unique
+  grn_details GRNDetails[]
+
+  purchase_order PurchaseOrder @relation(fields: [purchase_order_id],references: [id])
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("grn")
+}
+
+model GRNDetails {
+  id BigInt @id @default(autoincrement())
+  grn_id BigInt
+  product_id Int
+  store_id Int
+  batch_number String
+  quantity Int
+  sample_quantity Int 
+  buying_price Float
+  selling_price Float
+  expiry_date DateTime
+
+  grn GRN @relation(fields: [grn_id],references: [id])
+  product Product @relation(fields: [product_id],references: [id])
+  store Store @relation(fields: [store_id],references: [id])
+
+  @@map("grn_details")
+}
+
+model PurchaseReturn {
+  id BigInt @id @default(autoincrement())
+  purchase_order_id BigInt
+  product_id Int
+  quantity Int 
+  return_date DateTime
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("purchase_returns")
+
+}
+
+enum PurchaseOrderActions {
+  PURCHASE_CREATED
+  PURCHASE_UPDATED 
+  PURCHASE_RETURNED
+  GRN_CREATED 
+  GRN_UPDATED
+}
+
+model PurchaseOrderHistory {
+  id BigInt @id @default(autoincrement())
+  action PurchaseOrderActions
+  done_by_id Int 
+  timestamp DateTime
+  purchase_order_id BigInt 
+
+  done_by User @relation(fields: [done_by_id],references: [id])
+  purchase_order PurchaseOrder @relation(fields: [purchase_order_id],references: [id])
+
+  @@map("purchase_histories")
+}
+
+// Transfer Between stores
+
+enum TransferRequestStatus {
+  PENDING 
+  SHIPPED
+  RECIEVED
+  CANCELLED
+}
+
+enum TransferAction {
+  REQUEST_CREATED
+  REQUEST_UPDATED
+  GOODS_ACCEPTED
+  GOODS_RETURNED
+}
+
+model TransferRequest {
+  id BigInt @id @default(autoincrement())
+  from_store_id Int
+  to_store_id Int
+  request_date DateTime
+  transfer_status TransferRequestStatus
+  transfer_request_details TransferRequestDetails[]
+
+  transfer_request_history TransferRequestHistory[]
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("transfer_requests")
+}
+
+model TransferRequestDetails {
+  id BigInt @id @default(autoincrement())
+  transfer_request_id BigInt
+  product_id Int 
+  requested_quantity Int 
+  good_details TransferredGoodsDetails[]
+
+  product Product @relation(fields: [product_id],references: [id])
+  transfer_request TransferRequest @relation(fields: [transfer_request_id],references: [id])
+
+@@map("transfer_request_details")
+}
+
+model TransferredGoodsDetails {
+  id BigInt @id @default(autoincrement())
+  transfer_request_details_id BigInt
+  grn_id BigInt
+  returned_quantity Int
+  accepted_quantity Int 
+
+  transfer_request_detail TransferRequestDetails @relation(fields: [transfer_request_details_id],references: [id])
+
+  @@map("transfer_good_details")
+}
+
+model TransferRequestHistory {
+   id BigInt @id @default(autoincrement())
+   action TransferAction
+   done_by_id Int 
+   transfer_request_id BigInt
+   remarks String
+   timestamp DateTime @default(now())
+
+   transfer_request TransferRequest @relation(fields: [transfer_request_id],references: [id])
+   done_by User @relation(name: "transfer_request_history",fields: [done_by_id],references: [id])
+
+   @@map("transfer_request_histories")
+}
+
+// Sales
+
+enum PaymentMethod {
+  CASH
+  CARD
+}
+
+enum SaleHistoryActions {
+  SALE_CREATED
+  SALE_UPDATED
+  SALE_GOOD_SENT
+  SALE_GOOD_RETURNED
+}
+
+model Sale {
+  id BigInt @id @default(autoincrement())
+  customer_id Int
+  user_id Int
+  total_amount Float
+  payment_method PaymentMethod
+
+  sale_histories SalesHistory[]
+  sale_details SaleDetails[]
+
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("sales")
+}
+
+model SaleDetails {
+  id BigInt @id @default(autoincrement())
+  sale_id BigInt
+  product_id Int
+
+  sale Sale @relation(fields: [sale_id],references: [id])
+  product Product @relation(fields: [product_id],references: [id])
+  sale_goods_details SaleGoodsDetails[]
+}
+
+model SaleGoodsDetails {
+  id BigInt @id @default(autoincrement())
+  sale_details_id BigInt
+  grn_id BigInt
+  quantity Int
+  selling_price Float
+  sale_details SaleDetails @relation(fields: [sale_details_id],references: [id])
+  sale_returned SaleReturnsDetails?
+}
+
+model SaleReturnsDetails {
+  id BigInt @id @default(autoincrement())
+  sale_good_details_id BigInt @unique
+  return_quantity Int 
+
+  sale_good_details SaleGoodsDetails @relation(fields: [sale_good_details_id],references: [id])
+}
+
+model SalesHistory {
+  id BigInt @id @default(autoincrement())
+   action SaleHistoryActions
+   done_by_id Int 
+   sale_id BigInt
+   remarks String
+   timestamp DateTime @default(now())
+
+   sale Sale @relation(fields: [sale_id],references: [id])
+   done_by User @relation(name: "sales_history",fields: [done_by_id],references: [id])
+
+   @@map("sales_histories")
 }
