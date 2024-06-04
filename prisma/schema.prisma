@@ -18,7 +18,10 @@ model User {
   status Boolean @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  roles Role[]
+
+  role_id Int?  
+  role Role? @relation(fields: [role_id],references: [id])
+
 
    // many to one
   created_products Product[] @relation("created_by")
@@ -42,8 +45,21 @@ model Role {
   updated_at DateTime @updatedAt
 
   users User[]
+  rolePermissions RolePermission[]
 
   @@map("roles")
+}
+
+model RolePermission {
+  id Int @id @default(autoincrement()) 
+  resource String
+  can_create Boolean
+  can_view Boolean
+  can_edit Boolean
+  can_delete Boolean
+  role_id Int
+  role Role @relation(fields: [role_id],references: [id])
+
 }
 
 
