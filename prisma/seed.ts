@@ -75,11 +75,8 @@ async function main() {
             email: 'supr@email.com',
             phone: "phone123",
             full_name: "super user",
-            role: {
-                connect: {
-                    id: superAdmin.id
-                }
-            }
+            role_id: superAdmin.id
+
         }
     })
 
@@ -92,11 +89,7 @@ async function main() {
             email: 'labuser@email.com',
             phone: "labuser123",
             full_name: "labuser user",
-            role: {
-                connect: {
-                    id: labStoreKeeper.id
-                }
-            }
+            role_id: labStoreKeeper.id
         }
     })
 
@@ -109,11 +102,7 @@ async function main() {
             email: 'pharmauser@email.com',
             phone: "pharmauser123",
             full_name: "pharmauser user",
-            role: {
-                connect: {
-                    id: pharmacy.id
-                }
-            }
+            role_id: pharmacy.id
         }
     })
 

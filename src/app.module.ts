@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AclModule } from './acl/acl.module';
 import { RolesModule } from './roles/roles.module';
+import { CaslModule } from './casl/casl.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -24,6 +25,7 @@ import configuration from './config/configuration';
     UsersModule,
     AclModule,
     RolesModule,
+    CaslModule,
   ],
   controllers: [AppController],
   providers: [AppService],
