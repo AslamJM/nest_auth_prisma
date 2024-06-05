@@ -4,10 +4,8 @@ import { CreateLabDto } from './dto/create-lab.dto';
 import { UpdateLabDto } from './dto/update-lab.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/role.guard';
-import { PermissionsGuard } from 'src/auth/guards/permission.guard';
-import { RolesEnum } from 'src/auth/auth.enum';
 import { Roles } from 'src/auth/decorators/role.decorator';
-import { Permissions } from 'src/auth/decorators/permission.decorator';
+import { PermissionResources } from '@prisma/client';
 
 @Controller('lab')
 export class LabController {
@@ -18,9 +16,8 @@ export class LabController {
     return this.labService.create(createLabDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard, PermissionsGuard)
-  @Roles(RolesEnum.SUPER_ADMIN)
-  @Permissions('lab_view')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(PermissionResources.all, PermissionResources.lab_all)
   @Get()
   findAll() {
     return this.labService.findAll();

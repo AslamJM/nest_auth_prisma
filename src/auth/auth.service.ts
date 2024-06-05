@@ -12,10 +12,13 @@ export class AuthService {
     async signIn(username: string, pass: string) {
         try {
             const user = await this.userService.findByUsername(username)
-            if (user.password !== pass) {
+
+
+            if (!user || user.password !== pass) {
                 throw new UnauthorizedException()
             }
             const { password, ...result } = user
+
             const payload = {
                 sub: result.id,
                 username: result.username
@@ -27,11 +30,12 @@ export class AuthService {
                 access_token: token
             }
         } catch (error) {
-            throw error
+            return error
         }
     }
 
     async profile(id: number) {
+
         try {
             const user = await this.userService.findOne(id)
             return user
