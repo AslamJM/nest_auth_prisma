@@ -1,4 +1,5 @@
 import { User } from "@prisma/client";
+import { RoleEntity } from "src/roles/roles.entity";
 
 export class UserEntity implements User {
     id: number;
@@ -11,5 +12,6 @@ export class UserEntity implements User {
     created_at: Date;
     updated_at: Date;
     role_id: number;
+    role: RoleEntity
 
 }

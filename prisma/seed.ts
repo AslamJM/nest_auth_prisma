@@ -1,18 +1,14 @@
-import { PrismaClient } from '@prisma/client'
+import { PermissionResources, PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 async function main() {
 
-    const superAdmin = await prisma.role.upsert({
-        where: {
-            name: "SUPER_ADMIN"
-        },
-        update: {},
-        create: {
+    const superAdmin = await prisma.role.create({
+        data: {
             name: "SUPER_ADMIN",
             description: "super admin",
             rolePermissions: {
                 create: {
-                    resource: "all",
+                    resource: PermissionResources.all,
                     can_create: true,
                     can_delete: true,
                     can_edit: true,
@@ -22,17 +18,14 @@ async function main() {
         }
     })
 
-    const labStoreKeeper = await prisma.role.upsert({
-        where: {
-            name: "LAB_STORE_KEEPER"
-        },
-        update: {},
-        create: {
+    const labStoreKeeper = await prisma.role.create({
+
+        data: {
             name: "LAB_STORE_KEEPER",
             description: "lab store keeper",
             rolePermissions: {
                 create: {
-                    resource: "lab",
+                    resource: PermissionResources.lab_all,
                     can_create: true,
                     can_delete: true,
                     can_edit: true,
@@ -42,18 +35,16 @@ async function main() {
         }
     })
 
-    const pharmacy = await prisma.role.upsert({
-        where: {
-            name: "PHARMACY_STORE_KEEPER"
-        },
-        update: {},
-        create: {
+    const pharmacy = await prisma.role.create({
+
+
+        data: {
             name: "PHARMACY_STORE_KEEPER",
             description: "pharmacy store keeper",
             rolePermissions: {
                 create: [
                     {
-                        resource: "pharmacy",
+                        resource: PermissionResources.pharmacy_all,
                         can_create: true,
                         can_delete: true,
                         can_edit: true,
@@ -76,7 +67,6 @@ async function main() {
             phone: "phone123",
             full_name: "super user",
             role_id: superAdmin.id
-
         }
     })
 

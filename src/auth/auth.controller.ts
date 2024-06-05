@@ -14,6 +14,7 @@ export class AuthController {
     login(
         @Body() dto: SignInDto
     ) {
+
         try {
             return this.authService.signIn(dto.username, dto.password)
         } catch (error) {
@@ -27,7 +28,7 @@ export class AuthController {
         @Request() req: any
     ) {
         try {
-            return this.authService.profile(req.user.sub)
+            return this.authService.profile(req.user.id)
         } catch (error) {
             return error
         }
