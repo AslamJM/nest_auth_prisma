@@ -26,6 +26,13 @@ export class UsersService {
         const user = await this.dbService.user.findFirstOrThrow({
             where: {
                 username
+            },
+            include: {
+                role: {
+                    include: {
+                        rolePermissions: true
+                    }
+                }
             }
         })
 
