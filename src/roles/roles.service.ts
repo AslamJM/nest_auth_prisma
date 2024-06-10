@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
-import { CreateRoleDto } from './dto/createRoleDto.dto';
-import { PermissionResources } from '@prisma/client';
+import { PermissionResources, Prisma } from '@prisma/client';
 
 @Injectable()
 export class RolesService {
@@ -11,12 +10,21 @@ export class RolesService {
     }
 
     async getAllRoles() {
-        const roles = await this.db.role.findMany({
-            include: {
-                rolePermissions: true
-            }
-        })
-        return roles
+        try {
+            const roles = await this.db.role.findMany({
+            })
+            return roles
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getOne(id: number) {
+        try {
+            return await this.db.role.findUnique({ where: { id } })
+        } catch (error) {
+            throw error
+        }
     }
 
     async getRolePermissionByResource(resource: PermissionResources) {
@@ -24,25 +32,26 @@ export class RolesService {
     }
 
 
-    async create(dto: CreateRoleDto) {
+    async create(dto: Prisma.RoleCreateInput) {
         try {
-            const { name, description, rolePermissions } = dto
-
             const role = await this.db.role.create({
-                data: {
-                    name,
-                    description,
-                    rolePermissions: {
-                        create: [
-                            ...rolePermissions
-                        ]
-                    }
-                },
-
+                data: dto
             })
             return role
         } catch (error) {
-            return error
+            throw error
+        }
+    }
+
+    async update(id: number, dto: Prisma.RoleUpdateInput) {
+        try {
+            const updated = await this.db.role.update({
+                where: { id },
+                data: dto
+            })
+            return updated
+        } catch (error) {
+            throw error
         }
     }
 
