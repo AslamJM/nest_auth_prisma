@@ -7,7 +7,7 @@ import {
     HttpStatus,
     BadRequestException,
 } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -26,6 +26,11 @@ export class ErrorsInterceptor implements NestInterceptor {
                     if (err instanceof PrismaClientKnownRequestError) {
                         return new HttpException(err.message, HttpStatus.BAD_REQUEST)
                     }
+
+                    if (err instanceof PrismaClientValidationError) {
+                        return new HttpException(err.message, HttpStatus.BAD_REQUEST)
+                    }
+
                     return new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
                 })),
             );
