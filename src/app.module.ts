@@ -10,6 +10,10 @@ import { UsersModule } from './users/users.module';
 import { AclModule } from './acl/acl.module';
 import { RolesModule } from './roles/roles.module';
 import { CaslModule } from './casl/casl.module';
+import { CategoriesModule } from './categories/categories.module';
+import { BrandsModule } from './brands/brands.module';
+import { UnitsModule } from './units/units.module';
+import { ProductsModule } from './products/products.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -26,6 +30,10 @@ import configuration from './config/configuration';
     AclModule,
     RolesModule,
     CaslModule,
+    CategoriesModule,
+    BrandsModule,
+    UnitsModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
