@@ -14,6 +14,13 @@ import { CategoriesModule } from './categories/categories.module';
 import { BrandsModule } from './brands/brands.module';
 import { UnitsModule } from './units/units.module';
 import { ProductsModule } from './products/products.module';
+import { CustomersModule } from './customers/customers.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
+import { StoresModule } from './stores/stores.module';
+import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
+import { GoodRecieveNotesModule } from './good-recieve-notes/good-recieve-notes.module';
+import { TransferRequestsModule } from './transfer-requests/transfer-requests.module';
+import { SalesModule } from './sales/sales.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -34,6 +41,13 @@ import configuration from './config/configuration';
     BrandsModule,
     UnitsModule,
     ProductsModule,
+    CustomersModule,
+    SuppliersModule,
+    StoresModule,
+    PurchaseOrdersModule,
+    GoodRecieveNotesModule,
+    TransferRequestsModule,
+    SalesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

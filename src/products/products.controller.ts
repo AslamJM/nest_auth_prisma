@@ -1,16 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { PermissionResources } from '@prisma/client';
+import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
+import { ErrorsInterceptor } from 'src/interceptors/errors.interceptor';
 
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(PermissionResources.all, "products_all")
+@UseInterceptors(TransformInterceptor, ErrorsInterceptor)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
   @Post()
-  async create(@Body() createProductDto: CreateProductDto) {
+  async create(@Body() createProductDto: CreateProductDto, @Req() request: any) {
+    const user = request.user
     try {
-      return await this.productsService.create(createProductDto);
+      return await this.productsService.create({ ...createProductDto, created_by_id: user.id });
 
     } catch (error) {
       throw error

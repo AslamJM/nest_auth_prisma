@@ -55,6 +55,7 @@ enum PermissionResources {
   user_all
   lab_all
   pharmacy_all
+  products_all
 }
 
 model RolePermission {
@@ -333,7 +334,7 @@ model TransferRequestDetails {
 model TransferredGoodsDetails {
   id Int @id @default(autoincrement())
   transfer_request_details_id Int
-  grn_id Int
+  grn_detail_id Int
   returned_quantity Int
   accepted_quantity Int 
 
@@ -400,7 +401,7 @@ model SaleDetails {
 model SaleGoodsDetails {
   id Int @id @default(autoincrement())
   sale_details_id Int
-  grn_id Int
+  grn_detail_id Int
   quantity Int
   selling_price Float
   sale_details SaleDetails @relation(fields: [sale_details_id],references: [id])

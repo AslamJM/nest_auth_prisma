@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsUrl } from "class-validator";
+import { IsInt, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class CreateProductDto {
     @IsString()
@@ -20,8 +20,10 @@ export class CreateProductDto {
     brand_id: number
 
     @IsInt()
+    @IsOptional()
     created_by_id: number
 
     @IsInt()
+    @IsOptional()
     updated_by_id: number
 }
